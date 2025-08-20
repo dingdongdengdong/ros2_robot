@@ -121,3 +121,36 @@ class SO101ROSConfig(ROS2Config):
             gripper_close_position=0.0,
         ),
     )
+
+
+@RobotConfig.register_subclass("bi_so100_ros")
+@dataclass
+class BiSO100ROSConfig(ROS2Config):
+    """Configuration for bimanual SO-100 arms in ROS 2."""
+
+    action_type: ActionType = ActionType.JOINT_POSITION
+
+    # Bimanual configuration - we'll handle two arms through the ros2_interface
+    ros2_interface: ROS2InterfaceConfig = field(
+        default_factory=lambda: ROS2InterfaceConfig(
+            # Both arms combined - left arm joints then right arm joints
+            arm_joint_names=[
+                "left_1", "left_2", "left_3", "left_4", "left_5", "left_6",
+                "right_1", "right_2", "right_3", "right_4", "right_5", "right_6"
+            ],
+            # We'll use left gripper as primary, could extend for dual grippers
+            gripper_joint_name="left_gripper",
+            base_link="base",
+            # Joint limits for SO-100 (repeated for both arms)
+            min_joint_positions=[
+                -1.91986, -1.74533, -1.74533, -1.65806, -2.79253, -1.74533,  # left arm + gripper
+                -1.91986, -1.74533, -1.74533, -1.65806, -2.79253, -1.74533   # right arm + gripper
+            ],
+            max_joint_positions=[
+                1.91986, 1.74533, 1.5708, 1.65806, 2.79253, 1.74533,  # left arm + gripper
+                1.91986, 1.74533, 1.5708, 1.65806, 2.79253, 1.74533   # right arm + gripper
+            ],
+            gripper_open_position=1.74533,
+            gripper_close_position=0.0,
+        ),
+    )
